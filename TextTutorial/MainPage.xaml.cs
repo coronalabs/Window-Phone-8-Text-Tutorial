@@ -86,8 +86,6 @@ namespace TextTutorial
             {
                 username = boxedUsername.ToString();
             }
-            Console.WriteLine("Got data from Lua... ");
-            Console.WriteLine(username);
 
             // Display your login popup here using the "loginName" fetched up above.
             var inputForm = new InputForm();
