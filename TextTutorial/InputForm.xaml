@@ -7,15 +7,19 @@
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
-    d:DesignHeight="480" d:DesignWidth="480">
-    
-    <Grid x:Name="LayoutRoot" Background="{StaticResource PhoneChromeBrush}">
-        <TextBlock x:Name="UsernameLabel" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Username" VerticalAlignment="Bottom" Margin="0,0,0,453"/>
-        <TextBox x:Name="Username" HorizontalAlignment="Left" Height="72" TextWrapping="Wrap" VerticalAlignment="Top" Width="456" Margin="0,21,0,0" InputScope="Default"/>
-        <TextBlock x:Name="PasswordLabel" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Password" VerticalAlignment="Top" Margin="0,98,0,0"/>
-        <TextBox x:Name="Password" HorizontalAlignment="Left" Height="72" TextWrapping="Wrap" VerticalAlignment="Top" Width="456" Margin="0,125,0,0" InputScope="Password"/>
-        <Button x:Name="OkayButton" Content="Okay" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,202,0,0" RenderTransformOrigin="0.452,0.477" Click="OkayButton_Click"/>
-        <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Left" Margin="333,202,0,0" VerticalAlignment="Top" Click="CancelButton_Click"/>
+	d:DesignWidth="480" d:DesignHeight="348.845">
 
-    </Grid>
+	<StackPanel Background="{StaticResource PhoneChromeBrush}">
+		<StackPanel Margin="10,10,10,10">
+			<TextBlock x:Name="fUsernameLabel" TextWrapping="Wrap" Text="Username"/>
+			<TextBox x:Name="fUsernameTextBox" InputScope="Default"/>
+			<TextBlock x:Name="fPasswordLabel" TextWrapping="Wrap" Text="Password"/>
+			<PasswordBox x:Name="fPasswordTextBox"/>
+			<StackPanel VerticalAlignment="Top" Orientation="Horizontal" HorizontalAlignment="Center">
+				<Button x:Name="fOkayButton" Content="Okay" Click="OkayButton_Click"/>
+				<Button x:Name="fCancelButton" Content="Cancel" Click="CancelButton_Click"/>
+			</StackPanel>
+		</StackPanel>
+	</StackPanel>
+
 </UserControl>

@@ -8,34 +8,61 @@ using System.Windows.Navigation;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 
+
 namespace TextTutorial
 {
-    public delegate void OnCompleteDelegate(object sender, RoutedEventArgs e, string username, string password);
-
     public partial class InputForm : UserControl
     {
-        public string username;
-        public string password;
+		public event EventHandler<EventArgs> Submitted;
+		public event EventHandler<EventArgs> Canceled;
 
-        public OnCompleteDelegate OnCompleteCallback;
-        public InputForm(string defaultValue)
+        public InputForm()
         {
             InitializeComponent();
-            Username.Text = defaultValue;
-            username = defaultValue;
+
+			this.MinWidth = System.Windows.Application.Current.Host.Content.ActualWidth * 0.8;
         }
+
+		public string Username
+		{
+			get { return fUsernameTextBox.Text; }
+			set
+			{
+				if (value == null)
+				{
+					value = string.Empty;
+				}
+				fUsernameTextBox.Text = value;
+			}
+		}
+
+		public string Password
+		{
+			get { return fPasswordTextBox.Password; }
+			set
+			{
+				if (value == null)
+				{
+					value = string.Empty;
+				}
+				fPasswordTextBox.Password = value;
+			}
+		}
 
         private void OkayButton_Click(object sender, RoutedEventArgs e)
         {
-            username = Username.Text;
-            password = Password.Text;
-            OnCompleteCallback(sender, e, username, password);
+			if (this.Submitted != null)
+			{
+				this.Submitted.Invoke(this, EventArgs.Empty);
+			}
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            OnCompleteCallback(sender, e, username, password);
-        }
-
+			if (this.Canceled != null)
+			{
+				this.Canceled.Invoke(this, EventArgs.Empty);
+			}
+		}
     }
 }

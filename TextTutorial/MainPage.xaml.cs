@@ -16,7 +16,6 @@ namespace TextTutorial
     {
         /// <summary>Reference to the Corona runtime environment that is currently running.</summary>
         private CoronaLabs.Corona.WinRT.CoronaRuntimeEnvironment fCoronaRuntimeEnvironment = null;
-        private InputForm control;
 
         public MainPage()
         {
@@ -82,7 +81,6 @@ namespace TextTutorial
         {
             // Fetch the "event.loginName" property, if provided.
             string username = string.Empty;
-
             var boxedUsername = e.Properties.Get("username") as CoronaLabs.Corona.WinRT.CoronaBoxedString;
             if (boxedUsername != null)
             {
@@ -90,40 +88,73 @@ namespace TextTutorial
             }
             Console.WriteLine("Got data from Lua... ");
             Console.WriteLine(username);
+
             // Display your login popup here using the "loginName" fetched up above.
-            control = new InputForm( username );
-            control.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
-            control.VerticalAlignment = System.Windows.VerticalAlignment.Center;
-            control.OnCompleteCallback = new OnCompleteDelegate(this.OnInputFormClosed);
-            fCoronaPanel.Children.Add(control);
-            control.Username.Text = username;
+            var inputForm = new InputForm();
+			inputForm.Username = username;
+			inputForm.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
+			inputForm.VerticalAlignment = System.Windows.VerticalAlignment.Center;
+			inputForm.Submitted += OnFormInputSubmitted;
+			inputForm.Canceled += OnFormInputCanceled;
+			fCoronaPanel.Children.Add(inputForm);
 
             // This returns nil to Lua.
             return null;
         }
 
-        /// <summary>*** You should call this method when the login popup closes.***</summary>
-        public void OnInputFormClosed(object sender, EventArgs e, string username, string password)
-        {
-            // Do not continue if the Corona runtime is no longer running.
-            if (fCoronaRuntimeEnvironment == null)
-            {
-                return;
-            }
+		/// <summary>Called by the InputForm when the OK button has been clicked on.</summary>
+		/// <param name="sender">Reference to the InputForm that raised this event.</param>
+		/// <param name="e">Empty event arguments.</param>
+		private void OnFormInputSubmitted(object sender, EventArgs e)
+		{
+			HandleFormInput(sender as InputForm, true);
+		}
 
-            // Create a custom Corona event named "userLoggedIn" with the following properties.
-            // This will be converted into a Lua "event" table once dispatched by Corona.
-            var eventProperties = CoronaLabs.Corona.WinRT.CoronaLuaEventProperties.CreateWithName("onLoginInfo");
-            eventProperties.Set("username", username);
-            eventProperties.Set("password", password);
+		/// <summary>Called by the InputForm when the Cancel button has been clicked on.</summary>
+		/// <param name="sender">Reference to the InputForm that raised this event.</param>
+		/// <param name="e">Empty event arguments.</param>
+		private void OnFormInputCanceled(object sender, EventArgs e)
+		{
+			HandleFormInput(sender as InputForm, false);
+		}
 
-            // Dispatch the event to Lua.
-            Console.WriteLine("closing form, sending data back to lua\n");
-            var eventArgs = new CoronaLabs.Corona.WinRT.CoronaLuaEventArgs(eventProperties);
-            fCoronaRuntimeEnvironment.DispatchEvent(eventArgs);
-            fCoronaPanel.Children.Remove(control);
-        }
-        private void OnAppObscured(object sender, ObscuredEventArgs e)
+		/// <summary>Dispatches InputForm data received by after a "Submitted" or "Canceled" event.</summary>
+		/// <param name="inputForm">Reference to the input form.</param>
+		/// <param name="wasSubmitted">Set true if the OK button was clicked. Set false if canceled.</param>
+		private void HandleFormInput(InputForm inputForm, bool wasSubmitted)
+		{
+			// Validate argument.
+			if (inputForm == null)
+			{
+				return;
+			}
+
+			// Close the input form and remove our event handlers from it.
+			// This will remove all references to this form, allowing it to be garbage collected.
+			fCoronaPanel.Children.Remove(inputForm);
+			inputForm.Submitted -= OnFormInputSubmitted;
+			inputForm.Canceled -= OnFormInputCanceled;
+
+			// Dispatch an event to Corona about the received input form data.
+			if (fCoronaRuntimeEnvironment != null)
+			{
+				// Create a custom Corona event named "userLoggedIn" with the following properties.
+				// This will be converted into a Lua "event" table once dispatched by Corona.
+				var eventProperties = CoronaLabs.Corona.WinRT.CoronaLuaEventProperties.CreateWithName("onLoginInfo");
+				eventProperties.Set("submitted", wasSubmitted);
+				if (wasSubmitted)
+				{
+					eventProperties.Set("username", inputForm.Username);
+					eventProperties.Set("password", inputForm.Password);
+				}
+
+				// Dispatch the event to Lua.
+				var eventArgs = new CoronaLabs.Corona.WinRT.CoronaLuaEventArgs(eventProperties);
+				fCoronaRuntimeEnvironment.DispatchEvent(eventArgs);
+			}
+		}
+
+		private void OnAppObscured(object sender, ObscuredEventArgs e)
         {
             if (e.IsLocked == false)
             {

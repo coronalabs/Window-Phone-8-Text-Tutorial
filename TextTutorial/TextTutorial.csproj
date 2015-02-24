@@ -137,7 +137,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <SDKReference Include="CoronaLabs.Corona.Framework, Version=14.0.2511.0">
+    <SDKReference Include="CoronaLabs.Corona.Framework, Version=15.0.2548.0">
       <Name>Corona Framework</Name>
     </SDKReference>
   </ItemGroup>

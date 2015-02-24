@@ -25,9 +25,13 @@ end
 -- Called when the C# login popup has been closed.
 function retrieveLoginInfo(event)
 	-- Fetch the login name and password. Do whatever you got to do here.
-	local username = event.username
-    local password = event.password
-	print("retrieved login info", username, password)
+	if event.submitted then
+		local username = event.username
+		local password = event.password
+		print("Retrieved login info", username, password)
+	else
+		print("Login was canceled.")
+	end
 end
 Runtime:addEventListener("onLoginInfo", retrieveLoginInfo)
 
